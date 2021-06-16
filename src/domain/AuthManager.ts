@@ -1,11 +1,17 @@
 import jwt from 'jsonwebtoken';
 
+export interface IAccessInfomation {
+    loginId: string,
+}
+
 export const getAccessToken = (secret: string, loginId: string) => {
     return new Promise<String>((resolve, reject) => {
+        const payload : IAccessInfomation = {
+            loginId: loginId
+        };
+    
         jwt.sign(
-            {
-                value: loginId
-            },
+            payload,
             secret,
             {
                 expiresIn: '7d',
@@ -30,11 +36,9 @@ export const decodeToken = (secret: string, token?: string) => {
     return new Promise<any>((resolve, reject) => {
         jwt.verify(String(token), secret, (error: any, decoded: any) => {
             if (error) {
-                throw new Error(error);
+                reject(error);
             }
-
             resolve(decoded);
         })
     })
-
 }

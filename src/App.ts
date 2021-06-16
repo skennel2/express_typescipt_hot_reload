@@ -1,13 +1,20 @@
 import express from 'express';
 import { TestRouter } from './TestRouter';
-import bodyParser from 'body-parser';
-import jwt from 'jsonwebtoken';
 import morgan from 'morgan';
 import cors from 'cors';
 import { MemberRouter } from './MemberController';
-import { PublicContoller } from './PublicController';
-import { resolve } from 'path';
-import { decodeToken } from './domain/AuthManager';
+import { PublicContoller, responseFailAuthentication } from './PublicController';
+import { decodeToken, IAccessInfomation } from './domain/AuthManager';
+
+// 리퀘스트 객체에 필요한 타입을 추가하기위함
+
+declare global {
+    namespace Express {
+        interface Request {
+            session: IAccessInfomation | undefined
+        }
+    }
+}
 
 const app = express();
 const port = process.env.PORT || '3030';
@@ -27,16 +34,17 @@ app.use('/test', testMiddleWare);
 // 인증 미들웨어
 
 const authMiddleWare = (request: express.Request, response: express.Response, next: express.NextFunction) => {
-    if(!request.headers.authorization) {
-        throw new Error('df')
+    if (!request.headers.authorization) {
+        responseFailAuthentication(response);
+        return;
     }
 
-    const token = request.headers.authorization.replace('Bearer ','')
+    const token = request.headers.authorization.replace('Bearer ', '')
     decodeToken(request.app.get('jwt-secret'), token).then((decoded) => {
-        console.log('ok', decoded)
-        request.body.session = decoded;
-        request.params.session = decoded;
+        request.session = decoded;
         next();
+    }).catch((error) => {
+        responseFailAuthentication(response);
     });
 }
 
