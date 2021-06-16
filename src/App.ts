@@ -24,6 +24,22 @@ const testMiddleWare = (request: express.Request, response: express.Response, ne
 }
 app.use('/test', testMiddleWare);
 
+// 인증 미들웨어
+
+const authMiddleWare = (request: express.Request, response: express.Response, next: express.NextFunction) => {
+    if(!request.headers.authorization) {
+        throw new Error('df')
+    }
+
+    const token = request.headers.authorization.replace('Bearer ','')
+    decodeToken(request.app.get('jwt-secret'), token).then((decoded) => {
+        console.log('ok', decoded)
+        request.body.session = decoded;
+        request.params.session = decoded;
+        next();
+    });
+}
+
 // 미들웨어 설정
 
 app.use(express.urlencoded({ extended: false }));
@@ -32,12 +48,12 @@ app.use(morgan('dev'))
 
 // 라우터 설정
 
-app.use('/route', TestRouter);
+app.use('/route', cors(), authMiddleWare, TestRouter);
 app.use('/member', MemberRouter);
 app.use('/public', cors(), PublicContoller)
 
 // // cors 헤더설정
-app.use(cors())
+
 // app.all('/*', function (req, res, next) {
 //     res.header("Access-Control-Allow-Origin", "*");
 //     res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -46,22 +62,10 @@ app.use(cors())
 
 // test api
 
-app.get('/needauth', cors({
-    allowedHeaders: 'Authorization'
-}), (request: express.Request, response: express.Response, next: express.NextFunction) => {
-    if(!request.headers.authorization) {
-        response.status(403).json({
-            message: '/testcors api call ok'
-        })
-        return;
-    }
-
-    const token = request.headers.authorization.replace('Bearer ','')
-    decodeToken(request.app.get('jwt-secret'), token).then((decoded) => {
-        response.json({
-            message: decoded
-        })
-    });
+app.get('/needauth', cors(), authMiddleWare, (request: express.Request, response: express.Response, next: express.NextFunction) => {
+    response.json({
+        data: 'hello'
+    })
 })
 
 app.get('/testcors', cors(), (request: express.Request, response: express.Response, next: express.NextFunction) => {
