@@ -28,7 +28,6 @@ export class TestMemberRepository {
         return this.members;
     };
 
-
     public getById = (id: string) => {
         return this.members.find(item => item.id === id) || null;
     };

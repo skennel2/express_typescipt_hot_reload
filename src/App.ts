@@ -2,9 +2,11 @@ import express from 'express';
 import { TestRouter } from './TestRouter';
 import morgan from 'morgan';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { MemberRouter } from './MemberController';
 import { PublicContoller, responseFailAuthentication } from './PublicController';
 import { decodeToken, IAccessInfomation } from './domain/AuthManager';
+import path from 'path'
 
 // 리퀘스트 객체에 필요한 타입을 추가하기위함
 
@@ -16,12 +18,20 @@ declare global {
     }
 }
 
+// dotenv
+dotenv.config({
+    path: path.resolve(
+        process.cwd(),
+        process.env.NODE_ENV === 'production' ? '.env' : '.env.dev'
+    )
+})
+
 const app = express();
 const port = process.env.PORT || '3030';
 
 // 어플리케이션 레벨 데이터 세팅
 
-app.set('jwt-secret', 'this is secret');
+app.set('jwt-secret', process.env.SECRET_KEY);
 
 // 어플리케이션 레벨 미들웨어 적용
 
@@ -53,6 +63,7 @@ const authMiddleWare = (request: express.Request, response: express.Response, ne
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(morgan('dev'))
+app.use('/static', express.static(process.cwd() + '/public'));
 
 // 라우터 설정
 
@@ -88,4 +99,6 @@ app.get('/testnocors', (request: express.Request, response: express.Response, ne
     })
 })
 
-app.listen(port);
+app.listen(port, () => {
+    console.log(process.env.START_LOG_MESSAGE)
+});
