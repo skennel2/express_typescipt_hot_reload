@@ -5,8 +5,9 @@ import { getAccessToken } from "./domain/AuthManager";
 const memberRepository = MemberRepository;
 const router = express.Router();
 
-router.post('/login', (request: express.Request, response: express.Response) => {
-    const member = memberRepository.getByLoginId(request.body.loginId);
+router.post('/login', async (request: express.Request, response: express.Response) => {
+    const member = await memberRepository.getByLoginId(request.body.loginId);
+    
     if (!member) {
         responseFailAuthentication(response);
         return;

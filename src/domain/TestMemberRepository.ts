@@ -1,38 +1,35 @@
-import { IMember } from "./IMember";
+import { IMember, Member } from "./Member";
 
 export class TestMemberRepository {
-    private members: IMember[] = [
-        {
-            id: '1',
-            loginId: 'skennel',
-            name: '나윤수',
-            password: '1234',
-            iaAdmin: true
-        },
-        {
-            id: '2',
-            loginId: 'gaeko14',
-            name: '나진수',
-            password: '6565',
-        },
-        {
-            id: '3',
-            loginId: 'test11',
-            name: '김윤미',
-            password: '1111aaaa',
+    public getAll = async () => {
+        const members = await Member.findAll();
+        return members.map(member => member.mapToModel());
+    };
+
+    public getById = async (id: number) => {
+        const member = await Member.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        if (member === null) {
+            return null;
         }
-    ];
 
-
-    public getAll = () => {
-        return this.members;
+        return member.mapToModel();
     };
 
-    public getById = (id: string) => {
-        return this.members.find(item => item.id === id) || null;
-    };
-
-    public getByLoginId = (loginId: string) => {
-        return this.members.find(item => item.loginId === loginId) || null;
+    public getByLoginId = async (loginId: string) => {
+        const member = await Member.findOne({
+            where: {
+                loginId: loginId
+            },
+            mapToModel: true,
+        });
+        if (member === null) {
+            return null;
+        }
+        return member.mapToModel();
     };
 }

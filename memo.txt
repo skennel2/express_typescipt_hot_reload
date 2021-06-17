@@ -1,0 +1,12 @@
+1. sequelize 구동시 에러
+
+아래 create함수에서 타입에러 TypeError: Class constructor Model cannot be invoked without 'new'
+"target": "es5" -> "target": "es6" 로 변경하니 동작.
+자바사크립트에서는 클래스의 실체는 함수이기 때문인것으로 생각됨
+
+        const admin = await MemberModel.create({
+            loginId: 'admin',
+            name: 'admin',
+            password: '1234qwer',
+            iaAdmin: 'Y'
+        });

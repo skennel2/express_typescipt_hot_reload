@@ -12,15 +12,15 @@ router.get('/', (request: express.Request, response: express.Response) => {
     });
 });
 
-router.get('/getall', (request: express.Request, response: express.Response) => {
+router.get('/getall', async (request: express.Request, response: express.Response) => {
     response.json({
-        data: memberRepository.getAll()
+        data: await memberRepository.getAll()
     });
 });
 
-router.get('/:id', (request: express.Request, response: express.Response) => {
+router.get('/:id', async (request: express.Request, response: express.Response) => {
     response.json({
-        data: memberRepository.getById(request.params.id)
+        data: await memberRepository.getById(Number(request.params.id))
     });
 });
 export const MemberRouter: express.Router = router;
