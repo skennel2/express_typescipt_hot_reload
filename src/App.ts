@@ -24,6 +24,7 @@ declare global {
 }
 
 // dotenv
+
 dotenv.config({
     path: path.resolve(
         process.cwd(),
@@ -59,6 +60,7 @@ const authMiddleWare = (request: express.Request, response: express.Response, ne
         request.session = decoded
         next()
     }).catch((error) => {
+        console.log(error)
         responseFailAuthentication(response)
     })
 }
@@ -73,14 +75,6 @@ app.use('/static', express.static(process.cwd() + '/public'))
 // 라우터 설정
 
 app.use('/public', cors(), AccessController);
-
-// // cors 헤더설정
-
-// app.all('/*', function (req, res, next) {
-//     res.header("Access-Control-Allow-Origin", "*")
-//     res.header("Access-Control-Allow-Headers", "X-Requested-With")
-//     next()
-// })
 
 // test api
 

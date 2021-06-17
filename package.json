@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon",
-    "build": "tsc",
+    "build:dev": "tsc && cp .env.dev ./dist/.env.dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

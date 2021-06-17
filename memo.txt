@@ -10,3 +10,8 @@
             password: '1234qwer',
             iaAdmin: 'Y'
         });
+
+2. tsc로 빌드시 .env파일이 옮겨지지않아. 빌드 결과물이 환경변수를 못읽는 문제
+
+빌드스크립트에 cp 구문으로 복사처리 추가
+"tsc && cp .env.dev ./dist/.env.dev"
