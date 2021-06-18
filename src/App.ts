@@ -6,12 +6,15 @@ import path from 'path'
 import { Sequelize } from 'sequelize'
 import Member, { Member as MemberModel } from './model/Member'
 import AccessController, { responseFailAuthentication } from './router/AccessController'
+import UpdateHistoryController from './router/UpdateHistoryController'
 import { decodeToken, IAccessInfomation } from './TokenManager'
+import UpdateList, { UpdateData, IUpdateData, UpdateWarningLevel } from './model/UpdateList'
 
 // sequelize
 
-const sequelize = new Sequelize('sqlite:' + process.cwd() + '/database/database.db');
-Member(sequelize);
+const sequelize = new Sequelize('sqlite:' + process.cwd() + '/database/database.db')
+Member(sequelize)
+UpdateList(sequelize)
 
 // 리퀘스트 객체에 필요한 타입을 추가하기위함
 
@@ -74,7 +77,8 @@ app.use('/static', express.static(process.cwd() + '/public'))
 
 // 라우터 설정
 
-app.use('/public', cors(), AccessController);
+app.use('/public', cors(), AccessController)
+app.use('/update', cors(), UpdateHistoryController)
 
 // test api
 
@@ -100,13 +104,11 @@ app.get('/testnocors', (request: express.Request, response: express.Response, ne
 
 const makeAdmin = async () => {
     try {
-        await sequelize.sync();
-
         const admin = await MemberModel.findOne({
             where: {
                 loginId: 'admin'
             }
-        });
+        })
 
         if (!admin && process.env.ADMIN_PASSWORD) {
             await MemberModel.create({
@@ -114,15 +116,46 @@ const makeAdmin = async () => {
                 name: 'admin',
                 password: process.env.ADMIN_PASSWORD,
                 iaAdmin: 'Y'
-            });
+            })
         }
     } catch (error) {
         console.error(error)
+        throw error
+
+    }
+}
+
+const makeUpdateList = async () => {
+    try {
+        const testUpdateData = {
+            subject: 'test',
+            componentName: 'etc',
+            type: 'bug',
+            warningLevel: '1',
+            updateDate: '20210101',
+        } as IUpdateData
+
+        await UpdateData.create(testUpdateData)
+
+        const testUpdateData2 = {
+            subject: 'hhh',
+            componentName: 'etc',
+            type: 'bug',
+            warningLevel: '1',
+            updateDate: '20210103',
+        } as IUpdateData
+
+        await UpdateData.create(testUpdateData2)
+    } catch (error) {
+        console.error(error)
+        throw error
     }
 }
 
 app.listen(port, async () => {
-    await makeAdmin();
+    await sequelize.sync()
+    await makeAdmin()
+    await makeUpdateList()
 
     console.log(process.env.START_LOG_MESSAGE)
 })

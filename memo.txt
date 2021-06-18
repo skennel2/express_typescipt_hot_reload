@@ -15,3 +15,6 @@
 
 빌드스크립트에 cp 구문으로 복사처리 추가
 "tsc && cp .env.dev ./dist/.env.dev"
+
+3. 시퀄라이즈 쿼리 간략 정리
+https://jeonghwan-kim.github.io/sequalize-%EC%BF%BC%EB%A6%AC/
